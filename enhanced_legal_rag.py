@@ -62,7 +62,7 @@ class EnhancedLegalRAG:
                     # Clean and normalize text
                     page_text = self.clean_text(page_text)
                     text += f"\n--- Page {page_num + 1} ---\n{page_text}\n"
-          return text
+        return text
     
     def clean_text(self, text: str) -> str:
         """Enhanced text cleaning for better embedding quality"""
@@ -88,7 +88,7 @@ class EnhancedLegalRAG:
         
         # Clean up legal references
         text = re.sub(r'(Article|Section|Chapter)\s+(\d+)', r'\1 \2', text, flags=re.IGNORECASE)
-          return text.strip()
+        return text.strip()
     
     def smart_chunk_text(self, text: str) -> List[Dict]:
         """Advanced chunking strategy with overlapping and semantic awareness"""
@@ -213,7 +213,7 @@ class EnhancedLegalRAG:
         # Add contextual chunks (combine related sections)
         contextual_chunks = self._create_contextual_chunks(main_sections)
         chunks.extend(contextual_chunks)
-          print(f"📊 Created {len(chunks)} advanced chunks (including {len([c for c in chunks if c.get('is_overlap')])} overlapping chunks)")
+        print(f"📊 Created {len(chunks)} advanced chunks (including {len([c for c in chunks if c.get('is_overlap')])} overlapping chunks)")
         return chunks
     
     def create_chunk_metadata(self, text: str, page: int, section: str) -> Dict:
@@ -292,7 +292,8 @@ class EnhancedLegalRAG:
         return contextual_chunks
     
     def process_document(self, text: str):
-        """Process document - alias for setup_rag for API compatibility"""        self.setup_rag(text)
+        """Process document - alias for setup_rag for API compatibility"""
+        self.setup_rag(text)
     
     def setup_rag(self, text: str):
         """Setup enhanced RAG system with advanced embedding strategies"""
@@ -400,7 +401,7 @@ class EnhancedLegalRAG:
                 if keyword not in self.keyword_index:
                     self.keyword_index[keyword] = []
                 self.keyword_index[keyword].append(i)
-      def search_relevant_chunks(self, question: str, top_k: int = 10) -> List[Dict]:
+    def search_relevant_chunks(self, question: str, top_k: int = 10) -> List[Dict]:
         """Advanced hybrid search combining vector similarity and keyword matching"""
         if self.index is None:
             return []
@@ -614,7 +615,7 @@ Provide a comprehensive answer that:
 Answer:"""
 
         return prompt
-      def ask_question(self, question: str) -> str:
+    def ask_question(self, question: str) -> str:
         """Advanced question answering with intelligent context creation"""
         if self.index is None:
             return "System not initialized"

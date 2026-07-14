@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect, useCallback, type KeyboardEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useBackend } from '@/hooks/useBackend';
 
 interface ChatMessage {
@@ -63,7 +62,6 @@ const INITIAL_MOCK_SESSIONS: ChatSession[] = [
 ];
 
 export default function Chat() {
-  const navigate = useNavigate();
   const { query } = useBackend();
 
   // Auth States

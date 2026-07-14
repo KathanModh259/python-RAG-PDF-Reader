@@ -21,7 +21,7 @@ interface HelplineSidebarProps {
 }
 
 export default function HelplineSidebar({ isOpen, onClose }: HelplineSidebarProps) {
-  const { t, language } = useLanguage();
+  const { t } = useLanguage();
   const [copied, setCopied] = useState<string | null>(null);
 
   const copyNumber = async (number: string) => {

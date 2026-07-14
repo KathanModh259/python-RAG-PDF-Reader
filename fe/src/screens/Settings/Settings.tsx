@@ -9,8 +9,6 @@ const FONT_SIZE_KEY = 'nyaya-mitra-font-size';
 const HIGH_CONTRAST_KEY = 'nyaya-mitra-high-contrast';
 const VOICE_INPUT_KEY = 'nyaya-mitra-voice-input';
 const READ_ALOUD_VOICE_KEY = 'nyaya-mitra-read-aloud-voice';
-const ANALYSES_COUNT_KEY = 'nyaya-mitra-analyses-count';
-const DOCUMENTS_KEY = 'nyaya-mitra-documents';
 
 function loadFontSize(): number {
   try {

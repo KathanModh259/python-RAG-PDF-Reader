@@ -1,6 +1,5 @@
 import { HashRouter, Routes, Route } from 'react-router-dom';
 import { LanguageProvider } from '@/lib/language';
-import Home from '@/screens/Home/Home';
 import PanicMode from '@/screens/PanicMode/PanicMode';
 import Response from '@/screens/Response/Response';
 import GuidedFlow from '@/screens/GuidedFlow/GuidedFlow';

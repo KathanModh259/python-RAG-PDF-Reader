@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import HelplineSidebar from '@/components/HelplineSidebar';
 import PanicButton from '@/components/PanicButton';
-import { Button } from '@/components/ui/button';
 import type { TileData } from '@/lib/types';
 import { useLanguage } from '@/lib/language';
 
@@ -76,7 +75,6 @@ const tiles: TileData[] = [
 export default function Home() {
   const navigate = useNavigate();
   const { t, language, setLanguage } = useLanguage();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [helplineOpen, setHelplineOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
 

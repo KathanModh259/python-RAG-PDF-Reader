@@ -1,0 +1,83 @@
+[tool.poetry]
+name = "legal-ai"
+version = "0.1.0"
+description = "Offline-first Legal AI desktop application for Indian legal corpora"
+authors = ["Legal AI Team"]
+readme = "README.md"
+license = "MIT"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.10"
+# Document ingestion
+PyMuPDF = "^1.23"
+python-docx = "^1.1"
+ebooklib = "^0.18"
+python-pptx = "^0.6"
+pillow = "^10.0"
+beautifulsoup4 = "^4.12"
+markdown = "^3.5"
+lxml = "^5.0"
+pytesseract = "^0.3"
+# Embeddings
+sentence-transformers = "^3.0"
+# Vector store
+chromadb = "^0.4"
+# Local LLM
+llama-cpp-python = "^0.2"
+# API
+fastapi = "^0.104"
+uvicorn = {version = "^0.24", extras = ["standard"]}
+python-multipart = "^0.0"
+# Desktop UI
+PyQt6 = "^6.5"
+# Config
+pydantic = "^2.5"
+pydantic-settings = "^2.1"
+# DI
+dependency-injector = "^4.41"
+# Security
+cryptography = "^41.0"
+# Numpy (pinned for chroma compat)
+numpy = "<2"
+# Utils
+requests = "^2.31"
+tqdm = "^4.66"
+pyyaml = "^6.0"
+rich = "^13.7"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.4"
+pytest-cov = "^4.1"
+ruff = "^0.1"
+mypy = "^1.7"
+black = "^23.11"
+pre-commit = "^3.5"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "UP", "B", "SIM", "ARG"]
+
+[tool.mypy]
+python_version = "3.10"
+strict = true
+ignore_missing_imports = true
+disallow_untyped_defs = true
+disallow_any_unimported = false
+
+[tool.black]
+line-length = 100
+target-version = ["py310"]
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = "-v --cov=app --cov-report=term-missing"

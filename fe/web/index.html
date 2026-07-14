@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nyaya Mitra — Legal AI Assistant</title>
+<style>
+:root {
+  --bg: #0f0f1a;
+  --surface: #1a1a2e;
+  --surface2: #16213e;
+  --primary: #e94560;
+  --primary-hover: #ff6b81;
+  --accent: #0f3460;
+  --text: #eaeaea;
+  --text-dim: #8899a6;
+  --border: #2a2a4a;
+  --success: #4ade80;
+  --warn: #fbbf24;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+.logo svg { width: 32px; height: 32px; }
+header nav {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+header nav button {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: 0.2s;
+}
+header nav button:hover { background: var(--accent); }
+header nav button.active { background: var(--primary); border-color: var(--primary); }
+.lang-btn {
+  background: transparent !important;
+  border: 1px solid var(--border) !important;
+  font-size: 0.8rem;
+}
+main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 32px 24px;
+  max-width: 960px;
+  margin: 0 auto;
+  width: 100%;
+}
+.hero {
+  text-align: center;
+  margin-bottom: 32px;
+}
+.hero h1 { font-size: 2rem; margin-bottom: 8px; }
+.hero p { color: var(--text-dim); font-size: 1rem; }
+.search-box {
+  width: 100%;
+  max-width: 720px;
+  margin-bottom: 24px;
+}
+.search-box textarea {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  color: var(--text);
+  font-size: 1rem;
+  resize: vertical;
+  min-height: 80px;
+  font-family: inherit;
+}
+.search-box textarea:focus { outline: none; border-color: var(--primary); }
+.search-controls {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.search-controls select {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+}
+.btn {
+  padding: 10px 24px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.btn-primary { background: var(--primary); color: #fff; }
+.btn-primary:hover { background: var(--primary-hover); }
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+.btn-secondary:hover { background: var(--accent); }
+.btn-ghost { background: transparent; color: var(--text-dim); padding: 8px 12px; }
+.btn-ghost:hover { color: var(--text); }
+.upload-area {
+  width: 100%;
+  max-width: 720px;
+  margin-bottom: 24px;
+}
+.upload-drop {
+  border: 2px dashed var(--border);
+  border-radius: 12px;
+  padding: 40px 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.upload-drop:hover, .upload-drop.dragover { border-color: var(--primary); background: var(--surface); }
+.upload-drop p { color: var(--text-dim); }
+.upload-drop .icon { font-size: 2rem; margin-bottom: 8px; }
+.result {
+  width: 100%;
+  max-width: 720px;
+  display: none;
+}
+.result.visible { display: block; }
+.result-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.result-header h2 { font-size: 1.1rem; }
+.confidence-badge {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+.confidence-high { background: #166534; color: #86efac; }
+.confidence-medium { background: #713f12; color: #fde68a; }
+.confidence-low { background: #7f1d1d; color: #fca5a5; }
+.answer-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 16px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+.sources-box {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+.sources-box h3 { font-size: 0.9rem; margin-bottom: 8px; color: var(--text-dim); }
+.sources-box ul { list-style: none; }
+.sources-box li {
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.85rem;
+  color: var(--text-dim);
+}
+.sources-box li:last-child { border-bottom: none; }
+.sources-box li .source-score { color: var(--warn); font-size: 0.75rem; }
+.result-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  width: 100%;
+  max-width: 720px;
+  margin-top: 16px;
+}
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+}
+.stat-card .value { font-size: 1.8rem; font-weight: 700; color: var(--primary); }
+.stat-card .label { font-size: 0.85rem; color: var(--text-dim); margin-top: 4px; }
+.loading {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-dim);
+  padding: 16px;
+}
+.loading.visible { display: flex; }
+.spinner {
+  width: 20px; height: 20px;
+  border: 2px solid var(--border);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 20px;
+  font-size: 0.85rem;
+  display: none;
+  z-index: 1000;
+  animation: slideUp 0.3s ease;
+}
+.toast.visible { display: block; }
+@keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+.copy-btn { cursor: pointer; }
+.section { width: 100%; max-width: 720px; }
+.section.hidden { display: none; }
+.upload-list { margin-top: 12px; }
+.upload-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 16px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-bottom: 8px;
+  font-size: 0.85rem;
+}
+.upload-item .status { font-size: 0.8rem; }
+.status-ok { color: var(--success); }
+footer {
+  padding: 16px 24px;
+  text-align: center;
+  color: var(--text-dim);
+  font-size: 0.8rem;
+  border-top: 1px solid var(--border);
+}
+@media (max-width: 600px) {
+  header { flex-direction: column; gap: 12px; }
+  main { padding: 16px; }
+  .hero h1 { font-size: 1.5rem; }
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">
+    <svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="14" stroke="currentColor" stroke-width="2"/><path d="M12 12h8v4l-2 2-2-2-2 2-2-2v-4z" fill="currentColor" opacity="0.6"/><path d="M12 18l2 2 2-2" stroke="currentColor" stroke-width="1.5"/></svg>
+    Nyaya Mitra
+  </div>
+  <nav>
+    <button class="active" data-tab="query">Ask</button>
+    <button data-tab="upload">Upload</button>
+    <button data-tab="stats">Stats</button>
+    <button class="lang-btn" id="langToggle">हिन्दी</button>
+  </nav>
+</header>
+<main>
+  <div class="hero">
+    <h1>Your Legal AI Assistant</h1>
+    <p>Ask questions about Indian law. Get answers with citations.</p>
+  </div>
+
+  <!-- Query Section -->
+  <div class="section" id="sectionQuery">
+    <div class="search-box">
+      <textarea id="queryInput" placeholder="Type your legal question here…" rows="3"></textarea>
+      <div class="search-controls">
+        <select id="modeSelect">
+          <option value="standard">Standard</option>
+          <option value="citizen">Citizen Protection</option>
+          <option value="detailed">Detailed</option>
+        </select>
+        <button class="btn btn-primary" id="askBtn">Ask</button>
+        <span class="loading" id="queryLoading"><span class="spinner"></span> Researching…</span>
+      </div>
+    </div>
+    <div class="result" id="resultBox">
+      <div class="result-header">
+        <h2>Answer</h2>
+        <span class="confidence-badge" id="confidenceBadge">Medium</span>
+      </div>
+      <div class="answer-box" id="answerBox"></div>
+      <div class="sources-box" id="sourcesBox">
+        <h3>Sources</h3>
+        <ul id="sourcesList"></ul>
+      </div>
+      <div class="result-actions">
+        <button class="btn btn-secondary" id="copyBtn">📋 Copy</button>
+        <button class="btn btn-secondary" id="speakBtn">🔊 Read Aloud</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Upload Section -->
+  <div class="section hidden" id="sectionUpload">
+    <div class="upload-area">
+      <div class="upload-drop" id="uploadDrop">
+        <div class="icon">📄</div>
+        <p><strong>Click to upload</strong> or drag and drop</p>
+        <p style="font-size:0.8rem;margin-top:4px;">PDF, DOCX, TXT (max 50 MB)</p>
+      </div>
+      <input type="file" id="fileInput" accept=".pdf,.docx,.doc,.txt" hidden>
+      <span class="loading" id="uploadLoading"><span class="spinner"></span> Processing…</span>
+      <div class="upload-list" id="uploadList"></div>
+    </div>
+  </div>
+
+  <!-- Stats Section -->
+  <div class="section hidden" id="sectionStats">
+    <div class="stats-grid" id="statsGrid">
+      <div class="stat-card"><div class="value" id="statDocs">—</div><div class="label">Documents Indexed</div></div>
+      <div class="stat-card"><div class="value" id="statModel">—</div><div class="label">Model Status</div></div>
+      <div class="stat-card"><div class="value" id="statStore">—</div><div class="label">Vector Store</div></div>
+    </div>
+    <button class="btn btn-ghost" id="refreshStats" style="margin-top:12px;">↻ Refresh</button>
+  </div>
+</main>
+<footer>Nyaya Mitra v0.1.0 — Powered by RAG + LLM. Not a substitute for professional legal advice.</footer>
+<div class="toast" id="toast"></div>
+
+<script>
+const API = '';
+const lang = { current: 'en' };
+const translations = {
+  en: {
+    title: 'Your Legal AI Assistant', subtitle: 'Ask questions about Indian law. Get answers with citations.',
+    ask: 'Ask', upload: 'Upload', stats: 'Stats', uploading: 'Uploading...', researching: 'Researching…',
+    answer: 'Answer', sources: 'Sources', copy: '📋 Copy', speak: '🔊 Read Aloud',
+    docsIndexed: 'Documents Indexed', modelStatus: 'Model Status', storeType: 'Vector Store',
+    refresh: '↻ Refresh', clickUpload: 'Click to upload or drag and drop',
+    uploadLimit: 'PDF, DOCX, TXT (max 50 MB)',
+    footer: 'Nyaya Mitra v0.1.0 — Powered by RAG + LLM. Not a substitute for professional legal advice.',
+    copied: 'Copied!', uploaded: 'Uploaded successfully!', error: 'Error',
+    noAnswer: 'No answer received.',
+  },
+  hi: {
+    title: 'आपका कानूनी AI सहायक', subtitle: 'भारतीय कानून के बारे में प्रश्न पूछें। उद्धरण के साथ उत्तर प्राप्त करें।',
+    ask: 'पूछें', upload: 'अपलोड', stats: 'आंकड़े', uploading: 'अपलोड हो रहा है...', researching: 'खोज जारी...',
+    answer: 'उत्तर', sources: 'स्रोत', copy: '📋 कॉपी', speak: '🔊 पढ़ें',
+    docsIndexed: 'दस्तावेज़ अनुक्रमित', modelStatus: 'मॉडल स्थिति', storeType: 'वेक्टर स्टोर',
+    refresh: '↻ ताज़ा करें', clickUpload: 'अपलोड करने के लिए क्लिक करें या खींचें',
+    uploadLimit: 'PDF, DOCX, TXT (अधिकतम 50 MB)',
+    footer: 'Nyaya Mitra v0.1.0 — RAG + LLM द्वारा संचालित। पेशेवर कानूनी सलाह का विकल्प नहीं।',
+    copied: 'कॉपी हो गया!', uploaded: 'सफलतापूर्वक अपलोड!', error: 'त्रुटि',
+    noAnswer: 'कोई उत्तर प्राप्त नहीं हुआ।',
+  }
+};
+function t(key) { return translations[lang.current][key] || translations.en[key] || key; }
+
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('visible');
+  setTimeout(() => el.classList.remove('visible'), 3000);
+}
+
+// Tab switching
+document.querySelectorAll('[data-tab]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('[data-tab]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
+    document.getElementById('section' + btn.dataset.tab.charAt(0).toUpperCase() + btn.dataset.tab.slice(1)).classList.remove('hidden');
+  });
+});
+
+// Language toggle
+document.getElementById('langToggle').addEventListener('click', () => {
+  lang.current = lang.current === 'en' ? 'hi' : 'en';
+  document.getElementById('langToggle').textContent = lang.current === 'en' ? 'हिन्दी' : 'English';
+  applyLang();
+});
+
+function applyLang() {
+  document.querySelector('.hero h1').textContent = t('title');
+  document.querySelector('.hero p').textContent = t('subtitle');
+  document.querySelector('[data-tab="query"]').textContent = t('ask');
+  document.querySelector('[data-tab="upload"]').textContent = t('upload');
+  document.querySelector('[data-tab="stats"]').textContent = t('stats');
+  document.getElementById('askBtn').innerHTML = t('ask');
+  document.getElementById('copyBtn').innerHTML = t('copy');
+  document.getElementById('speakBtn').innerHTML = t('speak');
+  document.querySelector('.upload-drop p:first-of-type').innerHTML = '<strong>' + t('clickUpload').split(' or ')[0] + '</strong> ' + (t('clickUpload').includes(' or ') ? 'or ' + t('clickUpload').split(' or ')[1] : '');
+  document.querySelector('.upload-drop p:last-of-type').textContent = t('uploadLimit');
+  document.getElementById('refreshStats').innerHTML = t('refresh');
+  document.querySelector('footer').textContent = t('footer');
+  document.querySelector('.result-header h2').textContent = t('answer');
+  document.querySelector('.sources-box h3').textContent = t('sources');
+  document.getElementById('statDocs').parentElement.querySelector('.label').textContent = t('docsIndexed');
+  document.getElementById('statModel').parentElement.querySelector('.label').textContent = t('modelStatus');
+  document.getElementById('statStore').parentElement.querySelector('.label').textContent = t('storeType');
+
+  const ql = document.getElementById('queryLoading');
+  if (ql.classList.contains('visible')) ql.innerHTML = '<span class="spinner"></span> ' + t('researching');
+  const ul = document.getElementById('uploadLoading');
+  if (ul.classList.contains('visible')) ul.innerHTML = '<span class="spinner"></span> ' + t('uploading');
+}
+
+// Query
+document.getElementById('askBtn').addEventListener('click', ask);
+document.getElementById('queryInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); ask(); }
+});
+
+async function ask() {
+  const q = document.getElementById('queryInput').value.trim();
+  if (!q) return;
+  const mode = document.getElementById('modeSelect').value;
+  const btn = document.getElementById('askBtn');
+  const loading = document.getElementById('queryLoading');
+  const result = document.getElementById('resultBox');
+  const answer = document.getElementById('answerBox');
+
+  btn.disabled = true; loading.classList.add('visible'); result.classList.remove('visible');
+
+  try {
+    const res = await fetch(API + '/query', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ question: q, mode })
+    });
+    if (!res.ok) { const err = await res.json(); throw new Error(err.detail || 'Request failed'); }
+    const data = await res.json();
+    displayResult(data);
+  } catch (err) {
+    answer.textContent = '⚠️ ' + t('error') + ': ' + err.message;
+    result.classList.add('visible');
+  } finally {
+    btn.disabled = false; loading.classList.remove('visible');
+  }
+}
+
+function displayResult(data) {
+  const result = document.getElementById('resultBox');
+  const answer = document.getElementById('answerBox');
+  const badge = document.getElementById('confidenceBadge');
+  const sourcesList = document.getElementById('sourcesList');
+
+  answer.textContent = data.answer || t('noAnswer');
+
+  const conf = data.confidence || 0;
+  badge.textContent = conf > 0.7 ? 'High' : conf > 0.4 ? 'Medium' : 'Low';
+  badge.className = 'confidence-badge ' + (conf > 0.7 ? 'confidence-high' : conf > 0.4 ? 'confidence-medium' : 'confidence-low');
+
+  sourcesList.innerHTML = '';
+  if (data.sources && data.sources.length) {
+    data.sources.forEach(s => {
+      const li = document.createElement('li');
+      li.innerHTML = (s.title || s.source || 'Document') +
+        ' <span class="source-score">— score: ' + (s.score ? s.score.toFixed(3) : 'N/A') + '</span>';
+      sourcesList.appendChild(li);
+    });
+  } else {
+    sourcesList.innerHTML = '<li style="color:var(--text-dim)">No sources referenced</li>';
+  }
+
+  result.classList.add('visible');
+}
+
+// Copy
+document.getElementById('copyBtn').addEventListener('click', () => {
+  const text = document.getElementById('answerBox').textContent;
+  navigator.clipboard.writeText(text).then(() => showToast(t('copied')));
+});
+
+// Speak
+document.getElementById('speakBtn').addEventListener('click', () => {
+  const text = document.getElementById('answerBox').textContent;
+  if (!text || text === t('noAnswer')) return;
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = lang.current === 'hi' ? 'hi-IN' : 'en-IN';
+  speechSynthesis.cancel();
+  speechSynthesis.speak(u);
+});
+
+// Upload
+const uploadDrop = document.getElementById('uploadDrop');
+const fileInput = document.getElementById('fileInput');
+
+uploadDrop.addEventListener('click', () => fileInput.click());
+uploadDrop.addEventListener('dragover', e => { e.preventDefault(); uploadDrop.classList.add('dragover'); });
+uploadDrop.addEventListener('dragleave', () => uploadDrop.classList.remove('dragover'));
+uploadDrop.addEventListener('drop', e => { e.preventDefault(); uploadDrop.classList.remove('dragover'); handleFile(e.dataTransfer.files[0]); });
+fileInput.addEventListener('change', () => { if (fileInput.files[0]) handleFile(fileInput.files[0]); });
+
+async function handleFile(file) {
+  if (!file) return;
+  const loading = document.getElementById('uploadLoading');
+  const list = document.getElementById('uploadList');
+  const item = document.createElement('div');
+  item.className = 'upload-item';
+  item.innerHTML = `<span>${file.name} (${(file.size / 1024).toFixed(0)} KB)</span><span class="status">⏳</span>`;
+  list.prepend(item);
+  loading.classList.add('visible');
+
+  try {
+    const fd = new FormData();
+    fd.append('file', file);
+    const res = await fetch(API + '/upload', { method: 'POST', body: fd });
+    if (!res.ok) throw new Error((await res.json()).detail || 'Upload failed');
+    const data = await res.json();
+    item.querySelector('.status').textContent = '✅ ' + data.chunks + ' chunks';
+    item.querySelector('.status').className = 'status status-ok';
+    showToast(t('uploaded'));
+  } catch (err) {
+    item.querySelector('.status').textContent = '❌ ' + err.message;
+    showToast(t('error') + ': ' + err.message);
+  } finally {
+    loading.classList.remove('visible');
+  }
+}
+
+// Stats
+document.getElementById('refreshStats').addEventListener('click', loadStats);
+async function loadStats() {
+  try {
+    const res = await fetch(API + '/stats');
+    if (!res.ok) throw new Error('Failed');
+    const data = await res.json();
+    document.getElementById('statDocs').textContent = data.documents_indexed ?? '—';
+    document.getElementById('statModel').textContent = data.model_loaded ? '✅ Loaded' : '❌ Not loaded';
+    document.getElementById('statStore').textContent = data.vector_store_type || '—';
+  } catch (e) {
+    document.getElementById('statDocs').textContent = '❌';
+    document.getElementById('statModel').textContent = '❌';
+    document.getElementById('statStore').textContent = 'offline';
+  }
+}
+loadStats();
+</script>
+</body>
+</html>

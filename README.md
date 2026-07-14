@@ -1,133 +1,121 @@
-# PDF Analyzer with Local Ollama
+# Nyaya Mitra (Legal AI Assistant)
 
-A powerful tool to analyze PDF documents and answer questions using Retrieval-Augmented Generation (RAG) with your local Ollama installation. This tool extracts content only from the provided PDF and doesn't use any external knowledge sources.
+**Nyaya Mitra** is an offline-first, citizen-centric Legal AI assistant and desktop application designed specifically for Indian legal contexts. It operates 100% locally with zero external network dependencies, ensuring complete privacy and offline utility.
 
-## Features
+Grounded in the Constitution of India, Central Bare Acts, and landmark legal cases, Nyaya Mitra assists citizens in understanding legal scenarios, identifying predatory practices, tracking legal aid workflows, and translating complex legalese into plain language.
 
-- **PDF Text Extraction**: Uses pdfplumber for robust text extraction, including Arabic text
-- **Semantic Search**: Creates embeddings and uses FAISS for fast similarity search
-- **Local AI**: Uses your local Ollama installation for answering questions
-- **Multi-language Support**: Works with Arabic, English, and other languages
-- **Two Interfaces**: Both web UI (Streamlit) and command-line interface
-- **Source Citation**: Shows which parts of the PDF were used to generate answers
+---
 
-## Installation
+## Key Features
 
-1. **Install Python dependencies**:
+- **Decoupled Architecture**: 
+  - **Local API Backend (`/be`)**: A robust Python RAG engine powered by FastAPI, `llama-cpp-python`, and local vector stores.
+  - **Desktop Frontend App (`/fe`)**: A modern, high-performance UI built with React, TypeScript, TailwindCSS v4, and Tauri.
+- **Citizen Protection & Anti-Exploitation**:
+  - **Contract & Document Scanner**: Detects unfair clauses, hidden liabilities, and scams locally.
+  - **Fee Sanity Checker**: Cross-references local legal fee databases to ensure users aren't overcharged.
+- **Emergency Panic Mode**:
+  - Automatically detects urgent/high-risk prompts and displays direct links to Indian legal aid services (e.g. NALSA, DLSA hotlines).
+- **Multilingual Support & Voice Integration**:
+  - Localized system prompts and screens for regional Indian languages.
+  - Speech-to-Text (STT) and Text-to-Speech (TTS) engine running locally.
+- **Decentralized Legal RAG**:
+  - Grounded legal search combining dense semantic embeddings (BGE-small) with sparse BM25 keyword search, reranked by a cross-encoder model.
+  - Splits documents based on legal syntax (Articles, Sections, Chapters).
+- **Second Opinion Evaluator**:
+  - Validates model responses against source citations to prevent hallucinations and check reasoning.
+- **Templates & Case Tracking**:
+  - Generates standardized legal draft templates.
+  - Tracks court case stages and hearing status locally.
+
+---
+
+## Directory Structure
+
+```
+python-RAG-PDF-Reader/
+├── be/                       # Backend Application
+│   ├── app/
+│   │   ├── api/              # FastAPI local API endpoints
+│   │   ├── core/             # RAG, ingestion, embedding, LLM, anti-exploitation, voice
+│   │   ├── di/               # dependency injection container
+│   │   ├── domain/           # Legal data models (Acts, Sections, Judgments, Cases)
+│   │   ├── infra/            # Config (.env settings), logging, storage, crypto
+│   │   └── ui/               # PyQt6 fallback desktop UI
+│   ├── data/                 # Raw/processed legal documents, vector DB, models
+│   ├── scripts/              # Setup, indexing, and packaging utilities
+│   └── pyproject.toml        # Poetry python configuration
+│
+├── fe/                       # Frontend Application
+│   ├── src/                  # React screens, components, custom hooks
+│   ├── src-tauri/            # Tauri desktop configuration & Rust build files
+│   ├── package.json          # Node dependencies and scripts
+│   └── vite.config.ts        # Vite configuration
+│
+└── docs/                     # Detailed architectural and usage documents
+```
+
+---
+
+## Getting Started
+
+### 1. Setting up the Backend (`/be`)
+
+Go to the [Backend Documentation](file:///c:/Kathan/exp/python-RAG-PDF-Reader/be/README.md) for more details.
+
 ```bash
-pip install -r requirements.txt
+cd be
+
+# Install dependencies using Poetry
+poetry install
+
+# Download the default quantized model (Phi-3-mini or TinyLlama)
+poetry run python scripts/download_model.py
+
+# Build the vector store database
+poetry run python scripts/build_knowledge_base.py
+
+# Run the backend API server
+poetry run python app/main.py --mode api
 ```
 
-2. **Install and setup Ollama**:
-   - Download Ollama from [https://ollama.ai](https://ollama.ai)
-   - Install and start the Ollama service
-   - Pull a model (e.g., `ollama pull llama3.2`)
+The FastAPI server will run locally at `http://127.0.0.1:8765`.
 
-3. **Verify Ollama is running**:
-```bash
-ollama list
-```
+### 2. Setting up the Frontend (`/fe`)
 
-## Usage
-
-### Web Interface (Recommended)
-
-1. **Start the Streamlit app**:
-```bash
-streamlit run pdf_analyzer.py
-```
-
-2. **Open your browser** to `http://localhost:8501`
-
-3. **Upload your PDF** and click "Process PDF"
-
-4. **Ask questions** about the PDF content
-
-### Command Line Interface
-
-1. **Run the CLI**:
-```bash
-python cli.py "path/to/your/pdf/file.pdf"
-```
-
-2. **Ask questions** interactively
-
-### Advanced Options
+Go to the [Frontend Documentation](file:///c:/Kathan/exp/python-RAG-PDF-Reader/fe/README.md) for more details.
 
 ```bash
-python cli.py "document.pdf" --model llama3.2 --chunk-size 500 --overlap 100 --top-k 5
+cd fe
+
+# Install Node dependencies
+npm install
+
+# Run the web development server (Vite)
+npm run dev
+
+# Or run it wrapped inside Tauri (Desktop Mode)
+npm run tauri dev
 ```
 
-## Configuration
+---
 
-Edit `config.py` to customize:
-- Ollama model name
-- Chunk size and overlap
-- Embedding model
-- Number of relevant chunks to retrieve
+## Model Specifications
 
-## How It Works
+- **Embedding Model**: `BAAI/bge-small-en-v1.5` (~100MB, local)
+- **Reranker Model**: `BAAI/bge-reranker-base` (local)
+- **Local LLM**: `Phi-3-mini-4k-instruct-GGUF` (or `TinyLlama-1.1B` as a lightweight alternative)
+- **Inference Library**: `llama-cpp-python` (CPU execution by default, supports CUDA hardware acceleration)
 
-1. **Text Extraction**: Extracts text from PDF using pdfplumber
-2. **Text Chunking**: Splits text into overlapping chunks for better context
-3. **Embedding Creation**: Creates vector embeddings using SentenceTransformers
-4. **Vector Storage**: Stores embeddings in FAISS index for fast similarity search
-5. **Question Processing**: 
-   - Converts question to embedding
-   - Finds most similar text chunks
-   - Sends relevant context to Ollama
-   - Returns AI-generated answer based only on PDF content
+---
 
-## Supported Models
+## Disclaimer
 
-Any Ollama model can be used. Popular choices:
-- `llama3.2` (recommended for general use)
-- `mistral`
-- `codellama` (for code-related documents)
-- `qwen2.5` (good for multilingual content)
+This tool is designed to provide informational assistance to citizens and is not a substitute for professional legal advice or legal representation. Always consult a qualified advocate for legal matters.
 
-Make sure to pull the model first: `ollama pull model-name`
-
-## Troubleshooting
-
-### Ollama Connection Issues
-- Ensure Ollama is running: `ollama serve`
-- Check if model is available: `ollama list`
-- Verify the model name in configuration
-
-### PDF Processing Issues
-- Ensure the PDF contains extractable text (not just images)
-- Try with a different PDF to isolate the issue
-- Check file permissions
-
-### Memory Issues
-- Reduce chunk size in configuration
-- Use a smaller embedding model
-- Process smaller PDFs
-
-## Example Questions
-
-For an Arabic legal document:
-- "ما هو موضوع هذا النظام؟" (What is the subject of this system?)
-- "ما هي المواد المتعلقة بالحكم؟" (What are the articles related to governance?)
-
-For English documents:
-- "What is the main topic of this document?"
-- "Summarize the key points"
-- "What are the requirements mentioned?"
-
-## File Structure
-
-```
-pdf_analyzer/
-├── pdf_analyzer.py      # Main Streamlit application
-├── cli.py              # Command-line interface
-├── config.py           # Configuration settings
-├── requirements.txt    # Python dependencies
-├── README.md          # This file
-└── cache/             # Cached indexes (created automatically)
-```
+---
 
 ## License
 
-This project is open source and available under the MIT License.
+MIT
+

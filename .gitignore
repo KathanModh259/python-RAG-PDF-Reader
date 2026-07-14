@@ -1,0 +1,50 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+*.egg-info/
+dist/
+build/
+*.egg
+.venv/
+venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+# Data (git-ignored; download via scripts)
+**/data/raw/*
+**/data/processed/*
+**/data/models/*
+!**/data/raw/.gitkeep
+!**/data/processed/.gitkeep
+!**/data/models/.gitkeep
+
+# Build artifacts
+*.exe
+*.msi
+*.dmg
+installer/Output/
+
+# Environment
+.env
+.env.local
+*.key
+*.pem
+certificates/
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store

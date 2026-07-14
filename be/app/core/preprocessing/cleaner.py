@@ -27,7 +27,11 @@ class TextCleaner:
     def _normalize_legal_refs(self, text: str) -> str:
         text = re.sub(r"(?i)(Article|Section|Chapter|Schedule)\s+(\d+)", r"\1 \2", text)
         text = re.sub(r"(?i)(Clause|Rule|Regulation)\s+(\d+)", r"\1 \2", text)
-        text = re.sub(r"(?i)(Part|Volume|Title)\s+([IVXLCDM]+)", r"\1 \2", text.upper())
+        text = re.sub(
+            r"(?i)(Part|Volume|Title)\s+([IVXLCDM]+)",
+            lambda m: f"{m.group(1).capitalize()} {m.group(2).upper()}",
+            text,
+        )
         return text
 
     def _strip_headers_footers(self, text: str) -> str:
